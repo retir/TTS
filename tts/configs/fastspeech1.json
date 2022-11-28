@@ -1,0 +1,129 @@
+{
+    "name": "mfa",
+    "n_gpu": 1,
+    "data" : {
+        "dataset": {
+            "type": "BufferDataset",
+            "args" : {}
+        },
+        "use_mfa": true,
+        "lexicon_path": "./librispeech-lexicon.txt",
+        "data_path": "./data/train.txt",
+        "mel_ground_truth": "./mels",
+        "alignment_path": "./alignments",
+        "pitch_path": "./pitches",
+        "energy_path": "./energies",
+        "mfa_path": "./TextGrid/LJSpeech",
+        "text_cleaners": ["english_cleaners"],
+        "sample_rate": 22050,
+        "hope_length": 256,
+        "batch_size": 48,
+        "batch_expand_size": 32
+    },
+    "arch": {
+        "type": "FastSpeech2",
+        "args": {
+            "vocab_size": 300,
+            "max_seq_len": 3000,
+            
+            "num_mels" : 80,
+            "stft_filter_lenght": 1024,
+            "stft_hop_lenght": 256,
+            "stft_win_lenght": 1024,
+            "sample_rate": 22050,
+            "mel_fmin": 0,
+            "mel_fmax": 8000,
+            
+            "pitch_min": 0.0,
+            "pitch_max": 861.0652680130653,
+            "pitch_mean": 127.59217395875189,
+            "pitch_std": 107.50582698588016,
+            "pitch_bins": 256,
+            
+            "energy_min": 0.01786651276051998,
+            "energy_max": 314.9619140625,
+            "energy_mean": 21.957090377807617,
+            "energy_std": 19.31754493713379,
+            "energy_bins": 256,
+            
+
+            "encoder_dim": 256,
+            "encoder_n_layer": 4,
+            "encoder_head": 2,
+            "encoder_conv1d_filter_size": 1024,
+
+            "decoder_dim": 256,
+            "decoder_n_layer": 6,
+            "decoder_head": 2,
+            "decoder_conv1d_filter_size": 1024,
+            
+            "dropout": 0.2,
+
+            "fft_conv1d_kernel": [9, 1],
+            "fft_conv1d_padding": [4, 0],
+
+            "duration_predictor_filter_size": 256,
+            "duration_predictor_kernel_size": 3,
+            "duration_predictor_dropout": 0.5,
+
+            "PAD": 0,
+            "UNK": 1,
+            "BOS": 2,
+            "EOS": 3,
+
+            "PAD_WORD": "<blank>",
+            "UNK_WORD": "<unk>",
+            "BOS_WORD": "<s>",
+            "EOS_WORD": "</s>"
+        }
+    },
+    "optimizer": {
+        "type": "AdamW",
+        "args": {
+            "lr": 0.001,
+            "betas": [0.9, 0.98],
+            "eps" : 1e-9
+        }
+    },
+    "loss": {
+        "type": "PEFastSpeechLoss",
+        "args": {}
+    },
+    "lr_scheduler": {
+        "type": "OneCycleLR",
+        "args": {
+            "steps_per_epoch": 800,
+            "epochs": 200,
+            "anneal_strategy": "cos",
+            "max_lr": 0.001,
+            "pct_start": 0.1
+        }
+    },
+    "logger": {
+        "type": "WanDBWriter",
+        "args": {
+            "logger_path": "./logger",
+            "save_step": 3000,
+            "log_step": 5,
+            "clear_Time": 20,
+            "wandb_project": "tts_project"
+        }
+    },
+    "trainer": {
+        "epochs": 600,
+        "save_dir": "saved/",
+        "save_period": 10,
+        "len_epoch": 800,
+        "grad_norm_clip": 1.0
+    },
+    "validation": {
+        "texts":
+        ["A defibrillator is a device that gives a high energy electric shock to the heart of someone who is in cardiac arrest",
+        "Massachusetts Institute of Technology may be best known for its math, science and engineering education",
+        "Wasserstein distance or Kantorovich Rubinstein metric is a distance function defined between probability distributions on a given metric space"],
+        "val_step": 10,
+        "durations": [0.8, 1.2],
+        "pitch": [0.8, 1.2],
+        "energy": [0.8, 1.2]
+    }
+}
