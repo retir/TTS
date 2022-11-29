@@ -102,7 +102,7 @@ if __name__ == "__main__":
         help="path to inference texts",
     )
     args.add_argument(
-        "-r",
+        "-o",
         "--results_dir",
         default="./results",
         type=str,
