@@ -46,8 +46,9 @@ def main(config, args):
     raw_texts = []
     with open(args.texts_pth, 'r') as f:
         raw_texts = f.readlines()
-    raw_texts = [text[:-2] for text in raw_texts]
-        
+    for i in range(len(raw_texts)):
+        if raw_texts[i][-1] == '\n':
+            raw_texts[i] = raw_texts[i][:-1]
     if config["data"]["use_mfa"]:
         val_text = preprocess_english(raw_texts, config["data"]["lexicon_path"], config['data']['text_cleaners'])
     else:      
